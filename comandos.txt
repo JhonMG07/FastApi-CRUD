@@ -1,0 +1,6 @@
+Entrar a script y
+    Active
+
+ pip install tecnologia
+ pip freeze > requirements.txt
+ pip install -r requirements.txt
