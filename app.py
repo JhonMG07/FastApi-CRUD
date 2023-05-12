@@ -4,8 +4,10 @@ from typing import Text, Optional
 from datetime import datetime
 from uuid import uuid4 as uuid
 from fastapi.responses import JSONResponse
+from mangum import Mangum
 
 app = FastAPI()
+handler = Mangum(app)
 
 posts: list = []
 
@@ -37,7 +39,7 @@ def get_posts():
 # Escribir un post/ guardarlo
 
 
-@app.post("/posts") #usar responsemodel para enviar un codigo especifico
+@app.post("/posts")  # usar responsemodel para enviar un codigo especifico
 def save_post(post: Post):
     # genero la id automatica necesito convertiro en str
     post.id = str(uuid())
