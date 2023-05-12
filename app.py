@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Text, Optional
 from datetime import datetime
 from uuid import uuid4 as uuid
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
@@ -28,7 +29,7 @@ def read_root():
 
 
 # Obtener todos los post
-@app.get("/post")
+@app.get("/posts")
 def get_posts():
     return posts
 
@@ -36,7 +37,7 @@ def get_posts():
 # Escribir un post/ guardarlo
 
 
-@app.post("/posts")
+@app.post("/posts") #usar responsemodel para enviar un codigo especifico
 def save_post(post: Post):
     # genero la id automatica necesito convertiro en str
     post.id = str(uuid())
@@ -55,4 +56,31 @@ def get_post_by_id(id: str):
     for post in posts:
         if post["id"] == id:
             return post
-    return "not found"
+    raise HTTPException(status_code=404, detail="Post not found")
+
+
+# Eliminar post , necesuito encontrar el indice para poder eliminarlo
+
+
+@app.delete("/posts/{id}")
+def delete_post_by_id(id: str):
+    for index, post in enumerate(posts):
+        if post["id"] == id:
+            posts.pop(index)
+            return {"message": "Post deleted"}
+    raise HTTPException(status_code=404, detail="Post not found")
+
+
+# Editar post
+
+
+@app.put("/posts/{id}")
+def update_post_by_id(id: str, updated_post: Post):
+    for index, post in enumerate(posts):
+        if post["id"] == id:
+            posts[index]["title"] = updated_post.title
+            posts[index]["content"] = updated_post.content
+            posts[index]["author"] = updated_post.author
+            return {"message": "Post updated"}
+
+    raise HTTPException(status_code=404, detail="Post not found")
